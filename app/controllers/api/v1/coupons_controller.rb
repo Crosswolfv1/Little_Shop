@@ -15,7 +15,26 @@ class Api::V1::CouponsController < ApplicationController
     render json: CouponSerializer.new(coupon)
   end
 
+  def update
+    coupon = Coupon.find(params[:id])
+    coupon.update!(coupon_params)
+    render json: CouponSerializer.new(coupon)
+  end
+
+  def create
+    coupon = Coupon.create!(coupon_params)
+    render json: CouponSerializer.new(coupon), status: :created
+  end
+
+  def destroy
+    render json: Coupon.delete(params[:id]), status: :no_content
+  end
+
   private
+
+  def coupon_params
+    params.require(:coupon).permit(:name, :description, :percent_off, :dollar_off, :status, :merchant_id)
+  end
 
   def record_not_found(exception)
     render json: ErrorSerializer.format_error(exception, 404), status: :not_found
