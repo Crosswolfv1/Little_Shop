@@ -25,4 +25,13 @@ Rails.application.routes.draw do
   post "/api/v1/items", to: "api/v1/items#create"
   delete "/api/v1/items/:id", to: "api/v1/items#destroy"
   get "/api/v1/items/:id/merchant", to: "api/v1/items_merchants#index"
+
+  namespace :api do
+    namespace :v1 do
+      resources :merchants do
+        resources :coupons
+      end
+      resources :coupons
+    end
+  end
 end
