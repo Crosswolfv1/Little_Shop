@@ -9,4 +9,23 @@ class Api::V1::CouponsController < ApplicationController
     options = { meta: { count: coupons.count } }
     render json: CouponSerializer.new(coupons, options)
   end
+
+  def show
+    coupon = Coupon.find(params[:id])
+    render json: CouponSerializer.new(coupon)
+  end
+
+  private
+
+  def record_not_found(exception)
+    render json: ErrorSerializer.format_error(exception, 404), status: :not_found
+  end
+
+  def record_invalid(exception)
+    render json: ErrorSerializer.format_error(exception, 404), status: :not_found
+  end
+
+  def invalid_parameters(exception)
+    render json: ErrorSerializer.format_error(exception, 400), status: :bad_request
+  end
 end
