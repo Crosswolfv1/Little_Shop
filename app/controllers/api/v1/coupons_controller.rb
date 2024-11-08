@@ -6,6 +6,7 @@ class Api::V1::CouponsController < ApplicationController
 
   def index
     coupons = Coupon.all
-    render json: CouponSerializer.new(coupons)
+    options = { meta: { count: coupons.count } }
+    render json: CouponSerializer.new(coupons, options)
   end
 end
