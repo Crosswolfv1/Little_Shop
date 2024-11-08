@@ -6,6 +6,45 @@ class Api::V1::CouponsController < ApplicationController
 
   def index
     coupons = Coupon.all
-    render json: CouponSerializer.new(coupons)
+    options = { meta: { count: coupons.count } }
+    render json: CouponSerializer.new(coupons, options)
+  end
+
+  def show
+    coupon = Coupon.find(params[:id])
+    render json: CouponSerializer.new(coupon)
+  end
+
+  def update
+    coupon = Coupon.find(params[:id])
+    coupon.update!(coupon_params)
+    render json: CouponSerializer.new(coupon)
+  end
+
+  def create
+    coupon = Coupon.create!(coupon_params)
+    render json: CouponSerializer.new(coupon), status: :created
+  end
+
+  def destroy
+    render json: Coupon.delete(params[:id]), status: :no_content
+  end
+
+  private
+
+  def coupon_params
+    params.require(:coupon).permit(:name, :description, :percent_off, :dollar_off, :status, :merchant_id)
+  end
+
+  def record_not_found(exception)
+    render json: ErrorSerializer.format_error(exception, 404), status: :not_found
+  end
+
+  def record_invalid(exception)
+    render json: ErrorSerializer.format_error(exception, 404), status: :not_found
+  end
+
+  def invalid_parameters(exception)
+    render json: ErrorSerializer.format_error(exception, 400), status: :bad_request
   end
 end
