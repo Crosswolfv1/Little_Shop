@@ -16,7 +16,6 @@ Rails.application.routes.draw do
   patch "/api/v1/merchants/:id", to: "api/v1/merchants#update"
   get "/api/v1/merchants/:id/customers", to: "api/v1/merchant_customers#index"
   get "/api/v1/merchants/:id/items", to: "api/v1/merchants_items#index"
-  get "/api/v1/merchants/:merchant_id/coupons", to: "api/v1/merchants_coupons#index"
 
   get "/api/v1/items", to: "api/v1/items#index"
   get "/api/v1/items/find_all", to:  "api/v1/items#find_all"
