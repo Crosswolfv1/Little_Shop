@@ -14,6 +14,7 @@ describe "coupons" do
       description: Faker::Commerce.promotion_code,
       percent_off: 25,
       dollar_off: nil,
+      status: "active",
       merchant_id: @merchant1.id
     )
 
@@ -22,6 +23,7 @@ describe "coupons" do
       description: Faker::Commerce.promotion_code,
       percent_off: 60,
       dollar_off: nil,
+      status: "inactive",
       merchant_id: @merchant1.id
     )
 
@@ -30,6 +32,7 @@ describe "coupons" do
       description: Faker::Commerce.promotion_code,
       percent_off: nil,
       dollar_off: 20,
+      status: "inactive",
       merchant_id: @merchant1.id
     )
 
@@ -38,6 +41,7 @@ describe "coupons" do
       description: Faker::Commerce.promotion_code,
       percent_off: 10,
       dollar_off: nil,
+      status: "active",
       merchant_id: @merchant2.id
     )
 
@@ -46,6 +50,7 @@ describe "coupons" do
       description: Faker::Commerce.promotion_code,
       percent_off: nil,
       dollar_off: 5,
+      status: "active",
       merchant_id: @merchant2.id
     )
   end
@@ -84,11 +89,12 @@ describe "coupons" do
 
         expect(coupon[:attributes][:percent_off].nil? && coupon[:attributes][:dollar_off].nil?).to be false
 
+        expect(coupon[:attributes]).to have_key(:status)
+        expect(coupon[:attributes][:status]).to be_a(String)
+
         expect(coupon[:attributes]).to have_key(:merchant_id)
         expect(coupon[:attributes][:merchant_id]).to be_a(Integer)
       end
-
-
     end
 
     it "can find all but is empty (SAD)" do
@@ -100,16 +106,41 @@ describe "coupons" do
       expect(coupons[:data].count).to eq(0)
       expect(coupons[:meta]).to have_key(:count)
       expect(coupons[:meta][:count]).to equal(coupons[:data].count)
-      binding.pry
-
-      
     end
 
     it "can find one coupon by ID" do
+      get "/api/v1/coupons/#{@coupon1.id}"
+      expect(response).to be_successful
+      coupon = JSON.parse(response.body, symbolize_names: true)
 
+      expect(coupon[:data]).to have_key(:id)
+      expect(coupon[:data][:id]).to be_an(String)
+
+      expect(coupon[:data][:attributes]).to have_key(:name)
+      expect(coupon[:data][:attributes][:name]).to be_a(String)
+
+      expect(coupon[:data][:attributes]).to have_key(:description)
+      expect(coupon[:data][:attributes][:description]).to be_a(String)
+
+      expect(coupon[:data][:attributes]).to have_key(:percent_off)
+      expect(coupon[:data][:attributes][:percent_off]).to be_a(Integer).or be_nil
+
+      expect(coupon[:data][:attributes]).to have_key(:dollar_off)
+      expect(coupon[:data][:attributes][:dollar_off]).to be_a(Integer).or be_nil
+
+      expect(coupon[:data][:attributes][:percent_off].nil? && coupon[:data][:attributes][:dollar_off].nil?).to be false
+
+      expect(coupon[:data][:attributes]).to have_key(:status)
+      expect(coupon[:data][:attributes][:status]).to be_a(String)
+
+      expect(coupon[:data][:attributes]).to have_key(:merchant_id)
+      expect(coupon[:data][:attributes][:merchant_id]).to be_a(Integer)
     end
 
     it "can't find a coupon by invalid ID (SAD)" do
+      get "/api/v1/coupons/200000"
+      expect(response).not_to be_successful
+      coupon = JSON.parse(response.body, symbolize_names: true)
 
     end
 
@@ -138,9 +169,9 @@ describe "coupons" do
     it "can update by ID" do
 
     end
-
+    
     it "cant update by ID (SAD)" do
-
+      
     end
   end
 end
