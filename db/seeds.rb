@@ -21,6 +21,7 @@ coupons_attributes = [
     description: "Get 10% off on all winter clothing.", 
     percent_off: 10, 
     dollar_off: nil, 
+    status: "active",
     merchant_id: merchant1.id
   },
   { 
@@ -28,6 +29,7 @@ coupons_attributes = [
     description: "Save $5 on your total purchase of $25 or more.", 
     percent_off: nil, 
     dollar_off: 5, 
+    status: "active",
     merchant_id: merchant2.id
   },
   { 
@@ -35,13 +37,15 @@ coupons_attributes = [
     description: "Enjoy 20% off on everything in-store!", 
     percent_off: 20, 
     dollar_off: nil, 
+    status: "inactive",
     merchant_id: merchant3.id
   },
   { 
     name: "Free Shipping on Orders over $50", 
     description: "Get free shipping when your order exceeds $50.", 
     percent_off: nil, 
-    dollar_off: nil, 
+    dollar_off: 50, 
+    status: "active",
     merchant_id: merchant1.id
   },
   { 
@@ -49,6 +53,7 @@ coupons_attributes = [
     description: "Get 10% off your first purchase.", 
     percent_off: 10, 
     dollar_off: nil, 
+    status: "inactive",
     merchant_id: merchant2.id
   }
 ]

@@ -5,6 +5,7 @@ class CreateCoupons < ActiveRecord::Migration[7.1]
       t.string :description
       t.integer :percent_off
       t.integer :dollar_off
+      t.string :status
       
       t.timestamps
     end

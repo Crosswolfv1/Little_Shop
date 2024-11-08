@@ -19,6 +19,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_08_172745) do
     t.string "description"
     t.integer "percent_off"
     t.integer "dollar_off"
+    t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "merchant_id", null: false
