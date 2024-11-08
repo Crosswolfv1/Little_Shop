@@ -1,6 +1,7 @@
 class Invoice < ApplicationRecord
   belongs_to :customer
   belongs_to :merchant
+  belongs_to :coupon, optional: true
   has_many :transactions
   has_many :invoiceItems
 
