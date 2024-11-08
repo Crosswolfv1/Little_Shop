@@ -10,7 +10,7 @@ describe "coupons" do
     )
 
     @coupon1 = Coupon.create(
-      name: Faker::Commerce.product_name,
+      name: "25% off your purchase",
       description: Faker::Commerce.promotion_code,
       percent_off: 25,
       dollar_off: nil,
@@ -19,7 +19,7 @@ describe "coupons" do
     )
 
     @coupon2 = Coupon.create(
-      name: Faker::Commerce.product_name,
+      name: "60% off the store",
       description: Faker::Commerce.promotion_code,
       percent_off: 60,
       dollar_off: nil,
@@ -28,7 +28,7 @@ describe "coupons" do
     )
 
     @coupon3 = Coupon.create(
-      name: Faker::Commerce.product_name,
+      name: "$20 off from tacos",
       description: Faker::Commerce.promotion_code,
       percent_off: nil,
       dollar_off: 20,
@@ -37,7 +37,7 @@ describe "coupons" do
     )
 
     @coupon4 = Coupon.create(
-      name: Faker::Commerce.product_name,
+      name: "10% on Baby Supplies",
       description: Faker::Commerce.promotion_code,
       percent_off: 10,
       dollar_off: nil,
@@ -53,6 +53,22 @@ describe "coupons" do
       status: "active",
       merchant_id: @merchant2.id
     )
+    @coupon6 = Coupon.create(
+      name: Faker::Commerce.product_name,
+      description: Faker::Commerce.promotion_code,
+      percent_off: 35,
+      dollar_off: nil,
+      status: "inactive",
+      merchant_id: @merchant1.id
+    )
+    @coupon7 = Coupon.create(
+      name: Faker::Commerce.product_name,
+      description: Faker::Commerce.promotion_code,
+      percent_off: nil,
+      dollar_off: 200,
+      status: "inactive",
+      merchant_id: @merchant1.id
+    )
   end
 
   after(:all) do
@@ -67,7 +83,7 @@ describe "coupons" do
       expect(response).to be_successful
       coupons = JSON.parse(response.body, symbolize_names: true)
     
-      expect(coupons[:data].count).to eq(5)
+      expect(coupons[:data].count).to eq(7)
       expect(coupons[:meta]).to have_key(:count)
       expect(coupons[:meta][:count]).to equal(coupons[:data].count)
 
@@ -145,33 +161,148 @@ describe "coupons" do
     end
 
     it "can create a coupon with valid parameters" do
+      coupon_params = {
+        name: Faker::Commerce.product_name,
+        description: Faker::Commerce.promotion_code,
+        percent_off: nil,
+        dollar_off: 300,
+        status: "inactive",
+        merchant_id: @merchant2.id
+      }
+      post '/api/v1/coupons', params: {coupon: coupon_params}
 
+      expect(response).to be_successful
+      coupon_created = JSON.parse(response.body, symbolize_names: true)
+      coupon = coupon_created[:data]
+
+      expect(coupon_created[:data]).to have_key(:id)
+      expect(coupon_created[:data][:id]).to be_an(String)
+
+      expect(coupon_created[:data][:attributes]).to have_key(:name)
+      expect(coupon_created[:data][:attributes][:name]).to be_a(String)
+
+      expect(coupon_created[:data][:attributes]).to have_key(:description)
+      expect(coupon_created[:data][:attributes][:description]).to be_a(String)
+
+      expect(coupon_created[:data][:attributes]).to have_key(:percent_off)
+      expect(coupon_created[:data][:attributes][:percent_off]).to be_a(Integer).or be_nil
+
+      expect(coupon_created[:data][:attributes]).to have_key(:dollar_off)
+      expect(coupon_created[:data][:attributes][:dollar_off]).to be_a(Integer).or be_nil
+
+      expect(coupon_created[:data][:attributes][:percent_off].nil? && coupon_created[:data][:attributes][:dollar_off].nil?).to be false
+
+      expect(coupon_created[:data][:attributes]).to have_key(:status)
+      expect(coupon_created[:data][:attributes][:status]).to be_a(String)
+
+      expect(coupon_created[:data][:attributes]).to have_key(:merchant_id)
+      expect(coupon_created[:data][:attributes][:merchant_id]).to be_a(Integer)
+
+      get "/api/v1/coupons"
+      all_coupons = JSON.parse(response.body, symbolize_names: true)
+
+      expect(all_coupons[:data]).to include(coupon)
     end
 
     describe "can handle extra or invalid parameters" do
       it "can handle extra params and still create (SADISH)" do
-
+        coupon_params = {
+          name: Faker::Commerce.product_name,
+          description: Faker::Commerce.promotion_code,
+          percent_off: nil,
+          dollar_off: 300,
+          status: "inactive",
+          merchant_id: @merchant2.id,
+          pineapples: "yes"
+        }
+        post '/api/v1/coupons', params: {coupon: coupon_params}
+  
+        expect(response).to be_successful
+        coupon_created = JSON.parse(response.body, symbolize_names: true)
+        expect(coupon_created[:data][:attributes]).not_to have_key(:pineapples)
+        expect(coupon_created[:data][:attributes][:pineapples]).to be(nil)
       end
 
       it "can't create with missing params (SAD)" do
+        coupon_params = {
+          name: Faker::Commerce.product_name,
+          description: Faker::Commerce.promotion_code,
+          percent_off: nil,
+          dollar_off: 300,
+          status: "inactive"
+        }  
 
+        post '/api/v1/coupons', params: {coupon: coupon_params}
+  
+        expect(response).not_to be_successful
+        json_response = JSON.parse(response.body, symbolize_names: true)
+        
+        expect(json_response[:errors]).to be_an(Array)
+        expect(json_response[:message]).to eq("Your query could not be completed")
+        expect(json_response[:errors][0]).to include("Merchant must exist")
       end
     end
 
     it "can delete by ID" do
+      coupon_params = {
+        name: Faker::Commerce.product_name,
+        description: Faker::Commerce.promotion_code,
+        percent_off: nil,
+        dollar_off: 300,
+        status: "inactive",
+        merchant_id: @merchant2.id
+      }
+      post '/api/v1/coupons', params: {coupon: coupon_params}
 
-    end
+      expect(response).to be_successful
+      coupon_created = JSON.parse(response.body, symbolize_names: true)
 
-    it "can't delete by incorrect/missing ID" do
+      coupon = coupon_created[:data]
+      coupon_id = coupon_created[:data][:id]
 
+      delete "/api/v1/coupons/#{coupon_id.to_i}"
+      expect(response).to be_successful
+
+      get "/api/v1/coupons"
+      all_coupons_delete = JSON.parse(response.body, symbolize_names: true)
+
+      expect(all_coupons_delete[:data]).not_to include(coupon)
     end
 
     it "can update by ID" do
+      updated_params = {
+        name: "buy one Get one!",
+        percent_off: 100
+      }
 
+      patch "/api/v1/coupons/#{@coupon2.id}", params: { coupon: updated_params }
+
+      expect(response).to be_successful
+
+      coupon = JSON.parse(response.body, symbolize_names: true)
+
+      expect(coupon[:data][:attributes][:name]).to eq("buy one Get one!")
+      expect(coupon[:data][:attributes][:percent_off]).to eq(100)
+      expect(coupon[:data][:attributes][:merchant_id]).to eq(@coupon2.merchant_id)
     end
     
-    it "cant update by ID (SAD)" do
-      
+    it "can update by ID (SAD) but extra attributes " do
+      updated_params = {
+        name: "buy one Get one!",
+        percent_off: 100,
+        battlepass: "active"
+      }
+
+      patch "/api/v1/coupons/#{@coupon2.id}", params: { coupon: updated_params }
+
+      expect(response).to be_successful
+
+      coupon = JSON.parse(response.body, symbolize_names: true)
+
+      expect(coupon[:data][:attributes][:name]).to eq("buy one Get one!")
+      expect(coupon[:data][:attributes][:percent_off]).to eq(100)
+      expect(coupon[:data][:attributes][:merchant_id]).to eq(@coupon2.merchant_id)
+      expect(coupon[:data][:attributes][:battlepass]).to be(nil)
     end
   end
 end
