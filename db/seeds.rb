@@ -22,6 +22,7 @@ coupons_attributes = [
     percent_off: 10, 
     dollar_off: nil, 
     status: "active",
+    code: "10degrees",
     merchant_id: merchant1.id
   },
   { 
@@ -30,6 +31,7 @@ coupons_attributes = [
     percent_off: nil, 
     dollar_off: 5, 
     status: "active",
+    code: "5altrive",
     merchant_id: merchant2.id
   },
   { 
@@ -38,6 +40,7 @@ coupons_attributes = [
     percent_off: 20, 
     dollar_off: nil, 
     status: "inactive",
+    code: "20forhoney",
     merchant_id: merchant3.id
   },
   { 
@@ -46,6 +49,7 @@ coupons_attributes = [
     percent_off: nil, 
     dollar_off: 50, 
     status: "active",
+    code: "50thrifty",
     merchant_id: merchant1.id
   },
   { 
@@ -54,6 +58,7 @@ coupons_attributes = [
     percent_off: 10, 
     dollar_off: nil, 
     status: "inactive",
+    code: "10forwin",
     merchant_id: merchant2.id
   }
 ]
