@@ -23,4 +23,13 @@ class Merchant < ApplicationRecord
     
     scope.empty? ? {} : scope.to_a
   end
+
+  def self.coupons_count(merchant_id)
+    coupons = Coupon.where(merchant_id: merchant_id)
+    coupons.where(status: 'active', merchant_id: merchant_id).count
+  end
+
+  def self.can_create_coupon?(merchant_id)
+    coupons_count(merchant_id) < 5
+  end
 end
