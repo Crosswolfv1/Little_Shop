@@ -15,6 +15,7 @@ describe "coupons" do
       percent_off: 25,
       dollar_off: nil,
       status: "active",
+      code: "25jointhehive",
       merchant_id: @merchant1.id
     )
 
@@ -24,6 +25,7 @@ describe "coupons" do
       percent_off: 60,
       dollar_off: nil,
       status: "inactive",
+      code: "60formisty",
       merchant_id: @merchant1.id
     )
 
@@ -33,6 +35,7 @@ describe "coupons" do
       percent_off: nil,
       dollar_off: 20,
       status: "inactive",
+      code: "20deephoney",
       merchant_id: @merchant1.id
     )
 
@@ -42,6 +45,7 @@ describe "coupons" do
       percent_off: 10,
       dollar_off: nil,
       status: "active",
+      code: "10forme",
       merchant_id: @merchant2.id
     )
 
@@ -51,6 +55,7 @@ describe "coupons" do
       percent_off: nil,
       dollar_off: 5,
       status: "active",
+      code: "5alive",
       merchant_id: @merchant2.id
     )
     @coupon6 = Coupon.create(
@@ -59,6 +64,7 @@ describe "coupons" do
       percent_off: 35,
       dollar_off: nil,
       status: "inactive",
+      code: "35cantdrive",
       merchant_id: @merchant1.id
     )
     @coupon7 = Coupon.create(
@@ -67,6 +73,7 @@ describe "coupons" do
       percent_off: nil,
       dollar_off: 200,
       status: "inactive",
+      code: "200formildred",
       merchant_id: @merchant1.id
     )
   end
@@ -146,6 +153,9 @@ describe "coupons" do
 
       expect(coupon[:data][:attributes][:percent_off].nil? && coupon[:data][:attributes][:dollar_off].nil?).to be false
 
+      expect(coupon[:data][:attributes]).to have_key(:code)
+      expect(coupon[:data][:attributes][:code]).to be_a(String)
+
       expect(coupon[:data][:attributes]).to have_key(:status)
       expect(coupon[:data][:attributes][:status]).to be_a(String)
 
@@ -167,6 +177,7 @@ describe "coupons" do
         percent_off: nil,
         dollar_off: 300,
         status: "inactive",
+        code: "300sparta",
         merchant_id: @merchant2.id
       }
       post '/api/v1/coupons', params: {coupon: coupon_params}
@@ -192,6 +203,9 @@ describe "coupons" do
 
       expect(coupon_created[:data][:attributes][:percent_off].nil? && coupon_created[:data][:attributes][:dollar_off].nil?).to be false
 
+      expect(coupon_created[:data][:attributes]).to have_key(:code)
+      expect(coupon_created[:data][:attributes][:code]).to be_a(String)
+
       expect(coupon_created[:data][:attributes]).to have_key(:status)
       expect(coupon_created[:data][:attributes][:status]).to be_a(String)
 
@@ -212,6 +226,7 @@ describe "coupons" do
           percent_off: nil,
           dollar_off: 300,
           status: "inactive",
+          code: "300sparta",
           merchant_id: @merchant2.id,
           pineapples: "yes"
         }
@@ -249,6 +264,7 @@ describe "coupons" do
         description: Faker::Commerce.promotion_code,
         percent_off: nil,
         dollar_off: 300,
+        code: "300sparta",
         status: "inactive",
         merchant_id: @merchant2.id
       }
