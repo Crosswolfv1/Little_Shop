@@ -43,8 +43,4 @@ class Api::V1::CouponsController < ApplicationController
   def record_invalid(exception)
     render json: ErrorSerializer.format_error(exception, 404), status: :not_found
   end
-
-  def invalid_parameters(exception)
-    render json: ErrorSerializer.format_error(exception, 400), status: :bad_request
-  end
 end
