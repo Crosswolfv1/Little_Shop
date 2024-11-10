@@ -33,7 +33,7 @@ class Api::V1::CouponsController < ApplicationController
   private
 
   def coupon_params
-    params.require(:coupon).permit(:name, :description, :percent_off, :dollar_off, :status, :merchant_id)
+    params.require(:coupon).permit(:name, :description, :percent_off, :dollar_off, :status, :code, :merchant_id)
   end
 
   def record_not_found(exception)
@@ -42,9 +42,5 @@ class Api::V1::CouponsController < ApplicationController
 
   def record_invalid(exception)
     render json: ErrorSerializer.format_error(exception, 404), status: :not_found
-  end
-
-  def invalid_parameters(exception)
-    render json: ErrorSerializer.format_error(exception, 400), status: :bad_request
   end
 end
