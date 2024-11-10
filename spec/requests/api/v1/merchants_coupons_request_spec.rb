@@ -10,6 +10,10 @@ describe "items_merchants" do
       name: "Steve"
     )
 
+    @merchant3 = Merchant.create(
+      name: "Mia"
+    )
+
     @coupon1 = Coupon.create(
       name: "25% off your purchase",
       description: Faker::Commerce.promotion_code,
@@ -76,6 +80,36 @@ describe "items_merchants" do
       status: "active",
       code: "200formildred",
       merchant_id: @merchant1.id
+    )
+
+    @coupon8 = Coupon.create(
+      name: Faker::Commerce.product_name,
+      description: Faker::Commerce.promotion_code,
+      percent_off: nil,
+      dollar_off: 100,
+      status: "active",
+      code: "100foridk",
+      merchant_id: @merchant3.id
+    )
+
+    @coupon9 = Coupon.create(
+      name: Faker::Commerce.product_name,
+      description: Faker::Commerce.promotion_code,
+      percent_off: 80,
+      dollar_off: nil,
+      status: "inactive",
+      code: "80formateys",
+      merchant_id: @merchant3.id
+    )
+
+    @coupon10 = Coupon.create(
+      name: Faker::Commerce.product_name,
+      description: Faker::Commerce.promotion_code,
+      percent_off: 90,
+      dollar_off: nil,
+      status: "active",
+      code: "90forstuff",
+      merchant_id: @merchant3.id
     )
 
     @bob = Customer.create!(
@@ -284,6 +318,49 @@ describe "items_merchants" do
       expect(data[:errors]).to be_an(Array)
       expect(data[:message]).to eq("Your query could not be completed")
       expect(data[:errors][0][:title]).to include("This coupon is in use")
+    end
+  end
+
+  describe "filtering" do
+    it "can filter based on active vs inactive" do
+      get "/api/v1/merchants/#{@merchant3.id}/coupons?status=active"
+      expect(response).to be_successful
+
+      merchants_coupons = JSON.parse(response.body, symbolize_names: true)
+
+      expect(merchants_coupons[:data].count).to eq(2)
+      expect(merchants_coupons[:data][0][:id]).to eq(@coupon8.id.to_s)
+      expect(merchants_coupons[:data][1][:id]).to eq(@coupon10.id.to_s)
+      expect(merchants_coupons[:data].map { |coupon| coupon[:id] }).not_to include(@coupon9.id.to_s)
+
+      get "/api/v1/merchants/#{@merchant3.id}/coupons?status=inactive"
+      expect(response).to be_successful
+
+      merchants_coupons = JSON.parse(response.body, symbolize_names: true)
+
+      expect(merchants_coupons[:data].count).to eq(1)
+      expect(merchants_coupons[:data][0][:id]).to eq(@coupon9.id.to_s)
+    end
+
+    it "edge case filters" do
+      get "/api/v1/merchants/#{@merchant3.id}/coupons?status=pineapple"
+      expect(response).not_to be_successful
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:errors]).to be_an(Array)
+      expect(data[:message]).to eq("Your query could not be completed")
+      expect(data[:errors][0][:title]).to include("Cannot search with provided param please search with active or inactive")
+
+
+
+      get "/api/v1/merchants/#{@merchant3.id}/coupons?status="
+      expect(response).not_to be_successful
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:errors]).to be_an(Array)
+      expect(data[:message]).to eq("Your query could not be completed")
+      expect(data[:errors][0][:title]).to include("Status input cannot be empty")
+
     end
   end
 end
