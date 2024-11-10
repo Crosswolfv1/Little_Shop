@@ -201,21 +201,89 @@ describe "items_merchants" do
         params = {
           name: Faker::Commerce.product_name,
           description: Faker::Commerce.promotion_code,
-          percent_off: 2000,
+          percent_off: 2,
           dollar_off: nil,
           status: "active",
-          code: "2kforhey",
+          code: "2foryou",
           merchant_id: @merchant1.id
         }
 
         post "/api/v1/merchants/#{@merchant1.id}/coupons", params: {coupon: params}
-        all_coupons = JSON.parse(response.body, symbolize_names: true)
         expect(response).not_to be_successful
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_an(Array)
+        expect(data[:message]).to eq("Your query could not be completed")
+        expect(data[:errors][0][:title]).to include("You already have 5 active coupons")  
       end
 
-      it "will fail to create a new coupon if code" do
-        
+      it "will fail to create a new coupon if code is not unique" do
+        get "/api/v1/merchants/#{@merchant2.id}/coupons"
+        merchants_coupons = JSON.parse(response.body, symbolize_names: true)
+        expect(merchants_coupons[:data].count).to eq(2)
+
+
+        params = {
+          name: Faker::Commerce.product_name,
+          description: Faker::Commerce.promotion_code,
+          percent_off: 2000,
+          dollar_off: nil,
+          status: "active",
+          code: "10forme",
+          merchant_id: @merchant2.id
+        }
+
+        post "/api/v1/merchants/#{@merchant2.id}/coupons", params: {coupon: params}
+        expect(response).not_to be_successful
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_an(Array)
+        expect(data[:message]).to eq("Your query could not be completed")
+        expect(data[:errors][0][:title]).to include("This coupon code already exists.")  
       end
+    end
+
+    it "can update a coupon to be active/inactive" do
+      get "/api/v1/merchants/#{@merchant2.id}/coupons/#{@coupon4.id}"
+      merchants_coupon = JSON.parse(response.body, symbolize_names: true)
+      expect(merchants_coupon[:data][:attributes][:status]).to eq("active")
+
+      params = {
+        status: "inactive",
+      }
+
+      patch "/api/v1/merchants/#{@merchant2.id}/coupons/#{@coupon4.id}", params: {coupon: params}
+      expect(response).to be_successful
+      merchants_inactive_coupon = JSON.parse(response.body, symbolize_names: true)
+
+      expect(merchants_inactive_coupon[:data][:attributes][:status]).to eq("inactive")
+
+      params = {
+        status: "active",
+      }
+      patch "/api/v1/merchants/#{@merchant2.id}/coupons/#{@coupon4.id}", params: {coupon: params}
+      expect(response).to be_successful
+      merchants_active_coupon = JSON.parse(response.body, symbolize_names: true)
+
+      expect(merchants_active_coupon[:data][:attributes][:status]).to eq("active")
+    end
+
+    it "SAD cant deactivate a coupon if an invoice is pending" do
+      get "/api/v1/merchants/#{@merchant1.id}/coupons/#{@coupon2.id}"
+      merchants_coupon = JSON.parse(response.body, symbolize_names: true)
+      expect(merchants_coupon[:data][:attributes][:status]).to eq("active")
+
+      params = {
+        status: "inactive",
+      }
+
+      patch "/api/v1/merchants/#{@merchant1.id}/coupons/#{@coupon2.id}", params: {coupon: params}
+      expect(response).not_to be_successful
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:errors]).to be_an(Array)
+      expect(data[:message]).to eq("Your query could not be completed")
+      expect(data[:errors][0][:title]).to include("This coupon is in use")
     end
   end
 end
