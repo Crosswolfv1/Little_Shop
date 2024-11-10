@@ -29,7 +29,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :merchants do
-        resources :coupons, controller: 'merchants_coupons'
+        resources :coupons, except: [:destroy], controller: 'merchants_coupons'
       end
       resources :coupons
     end
