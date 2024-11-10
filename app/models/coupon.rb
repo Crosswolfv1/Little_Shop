@@ -1,6 +1,6 @@
 class Coupon < ApplicationRecord
   belongs_to :merchant
-  has_one :invoice
+  has_many :invoice
 
   validates_presence_of :name, :presence => true
   validates_presence_of :description, :presence => true
