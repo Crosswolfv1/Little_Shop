@@ -16,12 +16,16 @@ class Api::V1::MerchantsCouponsController < ApplicationController
   end
 
   def create
-    if (Merchant.can_create_coupon?(params[:merchant_id]))
-      coupon = Coupon.create!(coupon_params)
-      render json: CouponSerializer.new(coupon), status: :created
-    else
-      raise ArgumentError, "You already have 5 active coupons."
-    end
+    can_create_coupon?(params[:merchant_id], params[:coupon][:code])
+    coupon = Coupon.create!(coupon_params)
+    render json: CouponSerializer.new(coupon), status: :created
+  end
+
+  def update
+    in_use?(params[:id])
+    coupon = Coupon.find(params[:id])
+    coupon.update!(coupon_params)
+    render json: CouponSerializer.new(coupon), status: :ok
   end
 
   private
@@ -30,7 +34,32 @@ class Api::V1::MerchantsCouponsController < ApplicationController
     params.require(:coupon).permit(:name, :description, :percent_off, :dollar_off, :status, :code, :merchant_id)
   end
 
+  def can_create_coupon?(merchant_id, code)
+    coupons_count(merchant_id) && coupons_unique?(merchant_id, code) 
+  end
+
+  def coupons_count(merchant_id)
+    if (Coupon.where(merchant_id: merchant_id, status: 'active').count >= 5)
+      raise ArgumentError, "You already have 5 active coupons."
+    end
+    true
+  end
+
+  def coupons_unique?(merchant_id, code)
+    if (Coupon.where(merchant_id: merchant_id, code: code).exists?)
+      raise ArgumentError, "This coupon code already exists."
+    end
+    true
+  end
+
   def too_many_coupons(exception)
     render json: ErrorSerializer.format_error(exception, 403), status: :forbidden
+  end
+
+  def in_use?(coupon_id)
+    if (Invoice.where(coupon_id: coupon_id).where.not(status: "shipped").exists?)
+      raise ArgumentError, "This coupon is in use"
+    end
+    true
   end
 end
