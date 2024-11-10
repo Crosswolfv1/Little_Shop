@@ -3,6 +3,8 @@ class Api::V1::MerchantsCouponsController < ApplicationController
   rescue_from ArgumentError, with: :too_many_coupons
   def index
     coupons = Coupon.where(merchant_id: params[:merchant_id])
+    validate_params
+    coupons = Coupon.filter_coupons(coupons, params)
     options = { meta: { count: coupons.count } }
     render json: CouponSerializer.new(coupons, options)
   end
@@ -61,5 +63,13 @@ class Api::V1::MerchantsCouponsController < ApplicationController
       raise ArgumentError, "This coupon is in use"
     end
     true
+  end
+
+  def validate_params
+    if params.has_key?(:status) && !params[:status].present?
+      raise ArgumentError, "Status input cannot be empty"
+    elsif params.has_key?(:status) && !%w[active inactive].include?(params[:status])
+      raise ArgumentError, "Cannot search with provided param please search with active or inactive"
+    end
   end
 end
