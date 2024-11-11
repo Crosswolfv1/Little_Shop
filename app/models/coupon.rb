@@ -18,5 +18,9 @@ class Coupon < ApplicationRecord
       scope
     end
   end
+
+  def self.coupon_validation(item_merchant_id, merchant_coupon_id)
+    item_merchant_id == merchant_coupon_id ? true : false
+  end
 end
 

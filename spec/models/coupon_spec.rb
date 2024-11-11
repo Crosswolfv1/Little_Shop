@@ -164,12 +164,41 @@ RSpec.describe Coupon, type: :model do
       status: "packaged",
       coupon_id: @coupon2.id
     )
+
+    @item1 = Item.create({
+      name: "apple",
+      description: "is am apple",
+      unit_price: 0.50,
+      merchant_id: @merchant1[:id]
+    })
+    
+    @item2 = Item.create({
+      name: "cherry",
+      description: "is am cherry",
+      unit_price: 1.50,
+      merchant_id: @merchant2[:id]
+    })
+    
+    @item3 = Item.create({
+      name: "pear",
+      description: "is am pear",
+      unit_price: 0.75,
+      merchant_id: @merchant1[:id]
+    })
+    
+    @item4 = Item.create({
+      name: "banana",
+      description: "is am banaa",
+      unit_price: 3.50,
+      merchant_id: @merchant2[:id]
+    })
   end
 
   after(:all) do
     Invoice.delete_all
     Merchant.delete_all
     Coupon.delete_all
+    Item.delete_all
   end
 
 
@@ -204,6 +233,11 @@ RSpec.describe Coupon, type: :model do
       params = {}
       coupons_filtered = Coupon.filter_coupons(Coupon.all, params)
       expect(coupons_filtered.count).to eq(10)
+    end
+
+    it "can return whether or not the item is from its merchant" do
+      expect(Coupon.coupon_validation(@item1[:merchant_id], @coupon1[:merchant_id])).to eq(true)
+      expect(Coupon.coupon_validation(@item2.merchant_id, @coupon1.merchant_id)).to eq(false)
 
     end
   end
