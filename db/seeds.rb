@@ -73,14 +73,63 @@ system(cmd)
 # customer1 = Customer.create({ first_name: 'John', last_name: 'Doe' })
 # customer2 = Customer.create({ first_name: 'Jane', last_name: 'Smith' })
 
-# invoices_attributes = [
-#   { customer_id: customer1.id, merchant_id: merchant1.id, coupon_id: coupon1.id, status: 'shipped' },
-#   { customer_id: customer1.id, merchant_id: merchant1.id, coupon_id: coupon1.id, status: 'packaged' },
-#   { customer_id: customer1.id, merchant_id: merchant2.id, coupon_id: coupon2.id, status: 'returned' },
-#   { customer_id: customer2.id, merchant_id: merchant3.id, coupon_id: nil, status: 'shipped' },
-#   { customer_id: customer2.id, merchant_id: merchant3.id, coupon_id: nil, status: 'shipped' }
-# ]
 
-# invoices_attributes.each do |invoice_attr|
-#   Invoice.find_or_create_by!(invoice_attr)
-# end
+# invoice1 = Invoice.create({ customer_id: customer1.id, merchant_id: merchant1.id, coupon_id: coupon1.id, status: 'shipped' })
+# invoice2 = Invoice.create({ customer_id: customer1.id, merchant_id: merchant1.id, coupon_id: coupon1.id, status: 'packaged' })
+# invoice3 = Invoice.create(  { customer_id: customer1.id, merchant_id: merchant2.id, coupon_id: coupon2.id, status: 'returned' })
+# invoice4 = Invoice.create(  { customer_id: customer2.id, merchant_id: merchant3.id, coupon_id: nil, status: 'shipped' })
+# invoice5 = Invoice.create(  { customer_id: customer2.id, merchant_id: merchant3.id, coupon_id: nil, status: 'shipped' })
+
+# item1 = Item.create({
+#   name: "apple",
+#   description: "is am apple",
+#   unit_price: 0.50,
+#   merchant_id: merchant1.id
+# })
+
+# item2 = Item.create({
+#   name: "cherry",
+#   description: "is am cherry",
+#   unit_price: 1.50,
+#   merchant_id: merchant2.id
+# })
+
+# item3 = Item.create({
+#   name: "pear",
+#   description: "is am pear",
+#   unit_price: 0.75,
+#   merchant_id: merchant1.id
+# })
+
+# item4 = Item.create({
+#   name: "banana",
+#   description: "is am banaa",
+#   unit_price: 3.50,
+#   merchant_id: merchant2.id
+# })
+
+# item5 = Item.create({
+#   name: "dog",
+#   description: "is dog",
+#   unit_price: 350.50,
+#   merchant_id: merchant3.id
+# })
+
+# item6 = Item.create({
+#   name: "cat",
+#   description: "is cat",
+#   unit_price: 300.50,
+#   merchant_id: merchant3.id
+# })
+
+# InvoiceItem.create({ invoice_id: invoice1.id, item_id: item1.id, quantity: 5, unit_price: item1.unit_price })
+# InvoiceItem.create({ invoice_id: invoice1.id, item_id: item3.id, quantity: 3, unit_price: item3.unit_price })
+
+# InvoiceItem.create({ invoice_id: invoice2.id, item_id: item1.id, quantity: 10, unit_price: item1.unit_price })
+# InvoiceItem.create({ invoice_id: invoice2.id, item_id: item3.id, quantity: 2, unit_price: item3.unit_price })
+
+# InvoiceItem.create({ invoice_id: invoice3.id, item_id: item2.id, quantity: 7, unit_price: item2.unit_price })
+# InvoiceItem.create({ invoice_id: invoice3.id, item_id: item4.id, quantity: 1, unit_price: item4.unit_price })
+
+# InvoiceItem.create({ invoice_id: invoice4.id, item_id: item5.id, quantity: 1, unit_price: item5.unit_price })
+# InvoiceItem.create({ invoice_id: invoice5.id, item_id: item6.id, quantity: 2, unit_price: item6.unit_price })
