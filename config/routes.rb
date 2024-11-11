@@ -31,7 +31,6 @@ Rails.application.routes.draw do
       resources :merchants do
         resources :coupons, controller: 'merchants_coupons'
       end
-      resources :coupons, except: [:destroy]
     end
   end
 end

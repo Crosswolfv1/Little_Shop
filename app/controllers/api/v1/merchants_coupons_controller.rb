@@ -32,9 +32,6 @@ class Api::V1::MerchantsCouponsController < ApplicationController
     render json: CouponSerializer.new(coupon), status: :ok
   end
 
-  def destroy
-    raise ActionController::RoutingError, "Deleting coupons is not allowed."
-  end
 
   private
 
