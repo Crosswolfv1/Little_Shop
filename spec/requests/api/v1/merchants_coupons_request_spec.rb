@@ -283,7 +283,7 @@ describe "items_merchants" do
       expect(merchants_coupon[:data][:attributes][:status]).to eq("active")
 
       params = {
-        status: "inactive",
+        status: "inactive"
       }
 
       patch "/api/v1/merchants/#{@merchant2.id}/coupons/#{@coupon4.id}", params: {coupon: params}
@@ -293,13 +293,26 @@ describe "items_merchants" do
       expect(merchants_inactive_coupon[:data][:attributes][:status]).to eq("inactive")
 
       params = {
-        status: "active",
+        status: "active"
       }
       patch "/api/v1/merchants/#{@merchant2.id}/coupons/#{@coupon4.id}", params: {coupon: params}
       expect(response).to be_successful
       merchants_active_coupon = JSON.parse(response.body, symbolize_names: true)
 
       expect(merchants_active_coupon[:data][:attributes][:status]).to eq("active")
+    end
+
+    it "SAD can only update using inactive or active for status" do
+      get "/api/v1/merchants/#{@merchant2.id}/coupons/#{@coupon4.id}"
+      merchants_coupon = JSON.parse(response.body, symbolize_names: true)
+      expect(merchants_coupon[:data][:attributes][:status]).to eq("active")
+
+      params = {
+        status: "bacon"
+      }
+      patch "/api/v1/merchants/#{@merchant2.id}/coupons/#{@coupon4.id}", params: {coupon: params}
+      expect(response).not_to be_successful
+
     end
 
     it "SAD cant deactivate a coupon if an invoice is pending" do
