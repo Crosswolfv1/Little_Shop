@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe 'Finding Customers By Merchant' do
-  after(:all) do
+  before(:all) do
     Invoice.delete_all
     Customer.delete_all
     Merchant.delete_all
