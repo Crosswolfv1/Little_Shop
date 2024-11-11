@@ -1,5 +1,6 @@
 class Api::V1::MerchantsCouponsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+  rescue_from ActionController::RoutingError, with: :destroy
   rescue_from ArgumentError, with: :too_many_coupons
   def index
     coupons = Coupon.where(merchant_id: params[:merchant_id])
@@ -25,10 +26,12 @@ class Api::V1::MerchantsCouponsController < ApplicationController
 
   def update
     in_use?(params[:id])
+    validate_status(params[:coupon][:status])
     coupon = Coupon.find(params[:id])
     coupon.update!(coupon_params)
     render json: CouponSerializer.new(coupon), status: :ok
   end
+
 
   private
 
@@ -59,7 +62,7 @@ class Api::V1::MerchantsCouponsController < ApplicationController
   end
 
   def in_use?(coupon_id)
-    if (Invoice.where(coupon_id: coupon_id).where.not(status: "shipped").exists?)
+    if Invoice.where(coupon_id: coupon_id).where.not(status: ["shipped", "returned"]).exists?
       raise ArgumentError, "This coupon is in use"
     end
     true
@@ -70,6 +73,12 @@ class Api::V1::MerchantsCouponsController < ApplicationController
       raise ArgumentError, "Status input cannot be empty"
     elsif params.has_key?(:status) && !%w[active inactive].include?(params[:status])
       raise ArgumentError, "Cannot search with provided param please search with active or inactive"
+    end
+  end
+
+  def validate_status(status)
+    unless %w[active inactive].include?(status)
+      raise ArgumentError, "Invalid status. Please use 'active' or 'inactive'."
     end
   end
 end
