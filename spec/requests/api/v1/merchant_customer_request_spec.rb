@@ -7,6 +7,12 @@ describe 'Finding Customers By Merchant' do
     Merchant.delete_all
   end
 
+  after(:all) do
+    Invoice.delete_all
+    Customer.delete_all
+    Merchant.delete_all
+  end
+
   it 'can return customers for a merchant' do
     merchant1 = Merchant.create(name: "Little Shop Of Horrors")
     m1id = merchant1.id
